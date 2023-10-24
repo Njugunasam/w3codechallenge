@@ -1,15 +1,16 @@
 let films = [];
 let currentMovie;
 
+// Add an event listener for the "DOMContentLoaded"
 document.addEventListener("DOMContentLoaded", function () {
     patchFilms();
 });
 
 async function patchFilms() {
     try {
-        const response = await fetch("  http://localhost:3000/films");
+        const response = await fetch("https://my-json-server.typicode.com/Njugunasam/w3codechallenge/films");
         const data = await response.json();
-        films = data.films;
+        films = data;
         displayFilmList();
         currentMovie = films[0];
         displayMovieDetails(currentMovie);
@@ -18,25 +19,24 @@ async function patchFilms() {
     }
 }
 
+// Display information about the movie.
 function displayMovieDetails(movie) {
     const availableTickets = movie.capacity - movie.tickets_sold;
     const movieDetailsContainer = document.querySelector("#movie-details");
     movieDetailsContainer.innerHTML = `
-        <div class="card" data-id="${movie.id}">
-            <img src="${movie.poster}" height="250px" class="card-img-top image" alt="...">
+        <div class="card mb-4" style="max-width: 18rem;" data-id="${movie.id}">
+            <img src="${movie.poster}" class="card-img-top" alt="${movie.title}">
             <div class="card-body">
                 <h5 class="card-title">${movie.title}</h5>
-                <span class="card-text">
-                    <ul>
-                        <li>Showtime: ${movie.showtime}</li>
-                        <li>Runtime: ${movie.runtime} minutes</li>
-                        <li>Available Tickets: ${availableTickets}</li>
-                    </ul>
-                </span>
-                <form class="w-100">
-                    <label>Tickets</label>
-                    <input type="number" min="1" max="${availableTickets}" value="1" />
-                    <button type="button" class="mx-auto w-100 btn btn-primary m-2">Buy Ticket</button>
+                <p class="card-text">Showtime: ${movie.showtime}</p>
+                <p class="card-text">Runtime: ${movie.runtime} minutes</p>
+                <p class="card-text">Available Tickets: ${availableTickets}</p>
+                <form>
+                    <div class="form-group">
+                        <label for="ticketInput">Tickets</label>
+                        <input type="number" class="form-control" id="ticketInput" min="1" max="${availableTickets}" value="1" />
+                    </div>
+                    <button class="btn btn-primary w-100 mt-2">Buy Ticket</button>
                 </form>
             </div>
         </div>
@@ -44,12 +44,14 @@ function displayMovieDetails(movie) {
     currentMovie = movie;
 }
 
+// Display the list of films 
 function displayFilmList() {
     const filmsListContainer = document.querySelector("#films");
 
     films.forEach((film) => {
         const listItem = document.createElement("li");
-        listItem.className = "list-group-item";
+        listItem.className = "film item list-group-item";
+        listItem.setAttribute("data-id", film.id);
         listItem.textContent = film.title;
         listItem.addEventListener("click", () => {
             displayMovieDetails(film);
@@ -58,6 +60,7 @@ function displayFilmList() {
     });
 }
 
+// Event listener for the "click" ticket purchases.
 document.addEventListener("click", function (event) {
     if (event.target.classList.contains("btn-primary")) {
         const card = event.target.closest(".card");
